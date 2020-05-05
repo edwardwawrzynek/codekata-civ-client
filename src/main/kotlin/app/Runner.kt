@@ -84,13 +84,16 @@ class Runner(val ai: AI, val apiUrl: String, val apiKey: String) {
             val pCities = cities.cities[i].map {c -> City(Pair(c.x, c.y))}
             val pArmies = armies.armies[i].map {a -> Army(Pair(a.x, a.y), a.hitpoints)}
             val pWorkers = workers.workers[i].map {w -> Worker(Pair(w.x, w.y))}
-            val pResources = mapOf(
-                    ResourceType.Food to resources.resources[i].food,
-                    ResourceType.Trade to resources.resources[i].trade,
-                    ResourceType.Production to resources.resources[i].production
-            )
+            val pResources = ResourceAmounts(resources.resources[i].food, resources.resources[i].production, resources.resources[i].trade)
 
-            Player(players.players[i].offense, players.players[i].defense, pCities, pWorkers, pArmies, pResources)
+            val mCities = mutableListOf<City>()
+            mCities.addAll(pCities)
+            val mArmies = mutableListOf<Army>()
+            mArmies.addAll(pArmies)
+            val mWorkers = mutableListOf<Worker>()
+            mWorkers.addAll(pWorkers)
+
+            Player(players.players[i].offense, players.players[i].defense, mCities, mWorkers, mArmies, pResources)
         }
     }
 

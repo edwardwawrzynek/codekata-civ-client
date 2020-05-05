@@ -3,6 +3,11 @@ package app
 import kotlin.math.abs
 
 /**
+ * A collection of resources
+ */
+data class ResourceAmounts(var food: Int, var production: Int, var trade: Int)
+
+/**
  * Types of tiles
  */
 enum class TileType (val apiIndex: Int) {
@@ -42,17 +47,18 @@ enum class TechnologyType(val apiIndex: Int) {
 data class GameMap(val size: Int, val contents: Array<Array<TileType>>) {
 
     // get the amount of resources that would be harvested on this tile, or null if the tile is fogged
-    fun getHarvestAmounts(position: Pair<Int, Int>): Map<ResourceType, Int>? {
+    fun getHarvestAmounts(position: Pair<Int, Int>): ResourceAmounts {
+        if(position.first < 0 || position.second < 0 || position.first >= size || position.second >= size) return ResourceAmounts(0, 0, 0)
         val type = contents[position.first][position.second]
 
         /* harvest table */
         return when(type) {
-            TileType.Ocean -> mapOf(ResourceType.Food to 1, ResourceType.Production to 0, ResourceType.Trade to 2)
-            TileType.Grassland -> mapOf(ResourceType.Food to 2, ResourceType.Production to 1, ResourceType.Trade to 0)
-            TileType.Hills -> mapOf(ResourceType.Food to 2, ResourceType.Production to 2, ResourceType.Trade to 1)
-            TileType.Forest -> mapOf(ResourceType.Food to 2, ResourceType.Production to 3, ResourceType.Trade to 0)
-            TileType.Mountains -> mapOf(ResourceType.Food to 1, ResourceType.Production to 1, ResourceType.Trade to 0)
-            else -> null
+            TileType.Ocean -> ResourceAmounts(1, 0, 2)
+            TileType.Grassland -> ResourceAmounts(2, 1, 0)
+            TileType.Hills -> ResourceAmounts(2, 2, 1)
+            TileType.Forest -> ResourceAmounts(2, 3, 0)
+            TileType.Mountains -> ResourceAmounts(1, 1, 0)
+            else -> ResourceAmounts(0, 0, 0)
         }
     }
 
@@ -105,12 +111,12 @@ class Worker(position: Pair<Int, Int>): BoardUnit(position)
  * A player and is associated state
  **/
 class Player(
-        val offensiveStrength: Double,
-        val defensiveStrength: Double,
-        val cities: List<City>,
-        val workers: List<Worker>,
-        val armies: List<Army>,
-        val resources: Map<ResourceType, Int>
+        var offensiveStrength: Double,
+        var defensiveStrength: Double,
+        val cities: MutableList<City>,
+        val workers: MutableList<Worker>,
+        val armies: MutableList<Army>,
+        val resources: ResourceAmounts
 ) {
 
 }
